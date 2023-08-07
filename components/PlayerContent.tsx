@@ -1,6 +1,6 @@
 "use client";
 
-import useSound from "use-sound";
+import useSound, { SoundControls } from "use-sound";
 import { useEffect, useState } from "react";
 import { BsPauseFill, BsPlayFill } from "react-icons/bs";
 import { HiSpeakerWave, HiSpeakerXMark } from "react-icons/hi2";
@@ -56,7 +56,7 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
     player.setId(previousSong);
   };
 
-  const [play, { pause, sound }] = useSound(songUrl, {
+  const [play, { pause }] = useSound(songUrl, {
     volume: volume,
     onplay: () => setIsPlaying(true),
     onend: () => {
@@ -65,15 +65,15 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ song, songUrl }) => {
     },
     onpause: () => setIsPlaying(false),
     format: ["mp3"],
-  });
+  }) as [() => void, SoundControls]; // Use type assertion here
 
   useEffect(() => {
-    sound?.play();
+    play(); // Instead of sound?.play()
 
     return () => {
-      sound?.unload();
+      pause(); // Instead of sound?.unload()
     };
-  }, [sound]);
+  }, [play, pause]);
 
   const handlePlay = () => {
     if (!isPlaying) {
